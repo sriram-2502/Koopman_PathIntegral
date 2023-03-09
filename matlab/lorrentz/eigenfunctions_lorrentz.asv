@@ -134,19 +134,6 @@ phi3 = reshape((phi3),size(q2));
 x_bin = discretize(x(:,1),gridx);
 y_bin = discretize(x(:,2),gridy);
 z_bin = discretize(x(:,3),gridz);
-bin_idx = [x_bin,y_bin,z_bin];
-bin = x(bin_idx);
-figure(2)
-
-subplot(1,3,1)
-sz = 50;
-plot3(x(:,1),x(:,2),x(:,3)); hold on
-scatter3(bin(:,1),bin(:,2),bin(:,3),sz,phi1(bin_idx),'filled');
-
-subplot(1,3,2)
-plot3(x(1,:),x(2,:),x(3,:)); hold on
-scatter3(bin(:,1),bin(:,2),bin(:,3),sz,phi2(bin_idx),'filled');
-
-subplot(1,3,3)
-plot3(x(1,:),x(2,:),x(3,:)); hold on
-scatter3(bin(:,1),bin(:,2),bin(:,3),sz,phi3(bin_idx),'filled');
+bin = [x_bin,y_bin,z_bin];
+figure()2
+plot3()
