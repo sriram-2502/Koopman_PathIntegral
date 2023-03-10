@@ -32,7 +32,7 @@ g2 = @(x) w2'*fn(x);
 w_bar = waitbar(0,'1','Name','Calcualting path integral...',...
     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 
-Dom = [-4 4]; ds = 0.04;
+Dom = [-4 4]; ds = 0.05;
 grid = Dom(1):ds:Dom(2); %define grid where eigenfunction is well defined
 [q1,q2] = meshgrid(grid);
 QQ = [q1(:)';q2(:)'];
@@ -40,8 +40,8 @@ U = f(0,QQ);
 
 %quiver(q1(:),q2(:),U(1,:)',U(2,:)')
 x_0 = [q1(:),q2(:)]; phi1_est=[];phi2_est=[];
-%options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
-options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
+options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
+%options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
 for i = 1:length(x_0)
     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
 
@@ -56,13 +56,15 @@ delete(F);
 %% Plots
 phi1_est_real = 2*real(phi1_est);
 phi1_est_imagin = -2*imag(phi1_est);
-%phi2_est_real = 2*real(phi2_est);
-%phi2_est_imagin = -2*imag(phi2_est);
-phi1_phase = atan(imag(phi1_est_real)./real(phi1_est));
+
+% phi1_phase = atan(phi1_est_imagin./phi1_est_real);
+% phi1_mag = sqrt(phi1_est_real.^2+phi1_est_imagin.^2);
+
+phi1_phase = atan(imag(phi1_est)./real(phi1_est));
 phi1_mag = sqrt(real(phi1_est).^2+imag(phi1_est).^2);
 
 
-figure()
+figure(1)
 subplot(2,2,1)
 phi1_estp = reshape((phi1_phase),size(q2));
 surf(q1,q2,phi1_estp);  hold on;
@@ -81,18 +83,16 @@ set(gca,'fontsize',20)
 
 subplot(2,2,3)
 zls = phi1_estp;
-zls(abs(phi1_estp)>5e-2)=-1; %zero-level set
+%zls(abs(phi1_estp)>5e-2)=-1; %zero-level set
 p1=pcolor(q1,q2,zls); 
-title('$Zero level of \phi_{phase}$','Interpreter','latex')
 colorbar
 colormap parula
 set(p1,'Edgecolor','none')
 
 subplot(2,2,4)
 zls1 = phi2_estp;
-zls1(abs(phi2_estp)>5e-2)=-1; %zero-level set
+%zls1(abs(phi2_estp)>5e-2)=-1; %zero-level set
 p2=pcolor(q1,q2,zls1); 
-title('$Zero level of \phi_{mag}$','Interpreter','latex')
 colorbar
 colormap parula
 set(p2,'Edgecolor','none')
@@ -105,8 +105,8 @@ set(p2,'Edgecolor','none')
 
 %% plots for paper
 ic_pts = 5;
-
-figure()
+tspan = [0 10];
+figure(2)
 subplot(1,2,1)
 phi1_mag = reshape((phi1_mag),size(q2));
 p1 = pcolor(q1,q2,phi1_mag); hold on;
@@ -123,14 +123,6 @@ for x0 = linspace(Dom(1), Dom(2), ic_pts)
     end
 end
 
-% plot phase portrait on top
-%     [x,y] = meshgrid(-bounds:0.01:bounds);
-%     u = alpha.*y;
-%     v = alpha.*(mu.*y - x - mu.*x^2.*y);
-%     l = streamslice(x,y,u,v);
-%     set(l,'LineWidth',1)
-%     set(l,'Color','k');
-    
 axes1 = gca;
 axis square
 axis([Dom(1) Dom(2) Dom(1) Dom(2)])
@@ -155,14 +147,6 @@ for x0 = linspace(Dom(1), Dom(2), ic_pts)
         plot(xs(:,1),xs(:,2),'k','LineWidth',1); hold on;
     end
 end
-
-%     % plot phase portrait on top
-%     [x,y] = meshgrid(-bounds:0.01:bounds);
-%     u = alpha.*y;
-%     v = alpha.*(mu.*y - x - mu.*x^2.*y);
-%     l = streamslice(x,y,u,v);
-%     set(l,'LineWidth',1)
-%     set(l,'Color','k');
 
 axes2 = gca;
 axis square

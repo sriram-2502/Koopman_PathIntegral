@@ -5,7 +5,7 @@ clc; clear; close all;
 Dom = [-6 6]; ds = 0.05;
 x = sym('x',[2;1]); 
 mu = 1;
-alpha = -1;
+alpha = 1;
 f = [alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))]; 
 
 % get quiver
