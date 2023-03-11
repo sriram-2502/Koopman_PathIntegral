@@ -1,5 +1,5 @@
 %% eigenfunctions for duffing system
-clc; clear; close all;
+clc; clear; %close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 % linearization at (0,0) saddle
@@ -80,11 +80,11 @@ for i = 1:length(x_0)
     [t,x] = ode45(@(t,x)f(x(1),x(2)),tspan,x_0(i,:), options);
     
     % terminate t and x when they enter linear region
-    idx = find(norm(x(end,:)-eqb_point_saddle)<1e-6);
-    if(~isempty(idx))
-        idx = idx(1);
-        t = t(1:idx); x = x(1:idx,:);
-    end
+%     idx = find(norm(x(end,:)-eqb_point_saddle)<1e-6);
+%     if(~isempty(idx))
+%         idx = idx(1);
+%         t = t(1:idx); x = x(1:idx,:);
+%     end
 
     % stable eigenfunctions at saddle point (0,0)
     phi1 = [phi1, w1'*x_0(i,:)' + trapz(t,exp(-eig_val1*t).*g1(x(:,1),x(:,2)),dim)];
@@ -155,10 +155,19 @@ ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
 colorbar
 %clim([-5e10, 5e10])
 box on
-axes.LineWidth=2;
+axes1.LineWidth=2;
 
 subplot(2,2,2)
-p2 = pcolor(q1,q2,phi2); hold on;
+% remove max and min value from the eqb points (-1,0) and (1,0)
+% [min_val, min_idx] = min(phi2,[],'all');
+% [r,c] = ind2sub(size(q1), min_idx);
+% phi2(r,c) = nan;
+% [max_val, max_idx] = max(phi2,[],'all');
+% [r,c] = ind2sub(size(q1), max_idx);
+% phi2(r,c) = nan;
+
+
+p2 = pcolor(q1,q2,log(phi2_shifted)); hold on;
 set(p2,'Edgecolor','none')
 colormap jet
 l = streamslice(X,Y,u,v); hold on;
@@ -184,7 +193,7 @@ ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
 colorbar
 %clim([-5e-4, 5e-4])
 box on
-axes.LineWidth=2;
+axes2.LineWidth=2;
 
 %% zero level set
 phi2_level_set = phi2;
