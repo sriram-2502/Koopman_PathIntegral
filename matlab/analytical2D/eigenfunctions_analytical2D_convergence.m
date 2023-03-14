@@ -15,7 +15,23 @@ beta=lambda2/(2*lambda1-lambda2); % for x2
 % f = @(t, x) [lambda1*x(1,:); lambda2*(x(2,:)+x(1,:).^2)];
 % beta=-lambda2/(2*lambda1-lambda2);
 
-% get quiver
+%% convergence check
+if(lambda2>0)
+    if(2*lambda1-lambda2 < 0)
+        disp('Convergece Condition is satified')
+    else
+        disp('Convergece Condition failed!!')
+    end
+end
+
+if(lambda2<0)
+    if(2*lambda1+lambda2<0)
+        disp('Convergece Condition is satified')
+    else
+        disp('Convergece Condition failed!!')
+    end
+end
+%% get quiver
 [X,Y] = meshgrid(Dom(1):0.5:Dom(2),Dom(1):0.5:Dom(2));
 u = (lambda1.*X);
 v = (lambda2.*(Y-X.^2));
@@ -42,9 +58,6 @@ w_bar = waitbar(0,'1','Name','Calcualting path integral...',...
 
 grid = Dom(1):0.1:Dom(2); %define grid where eigenfunction is well defined
 [q1,q2] = meshgrid(grid);
-QQ = [q1(:)';q2(:)'];
-U = f(0,QQ);
-%quiver(q1(:),q2(:),U(1,:)',U(2,:)')
 
 x_0 = [q1(:),q2(:)]; 
 phi1_est=[];phi2_est=[];
@@ -52,30 +65,29 @@ phi2_time_euler=[]; phi2_est_time_euler = [];
 phi2_time_ode45=[]; phi2_est_time_ode45 = [];
 options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
 
-for i = 1:length(x_0)
-    waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
-    
-    % do euler itegration
-    dt = 1e-4;
-    x0 = x_0(i,:);
-    x = x0'; dim=1;
-    phi2_time_euler=[];N=1e4;
-    
-    for euler_steps = 1:N
-        time_elapsed = euler_steps*dt;
-        x_new = x + dt*f(0,x);
-        % collect row vector of eig fun for each time
-        phi2_time_euler =[phi2_time_euler, w2'*x0' + trapz(time_elapsed,exp(-l2*time_elapsed).*g2(x_new)',dim)];
-        x = x_new;
-    end
-    % collect columns of phi1_time for each initial condition
-    phi2_est_time_euler = [phi2_est_time_euler;phi2_time_euler];
-
-    % usde ode45
-    [t,x] = ode45(@(t,x)f(t,x),[0 100],x_0(i,:), options);
-    phi2_est = [phi2_est, w2'*x_0(i,:)' + trapz(t,exp(-l2*t).*g2(x')')];
-
-end
+% for i = 1:length(x_0)
+%     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
+%     
+%     % do euler itegration
+%     dt = 1e-4;
+%     x0 = x_0(i,:);
+%     x = x0'; dim=1;
+%     phi2_time_euler=[];N=1e4;
+%     
+%     for euler_steps = 1:N
+%         time_elapsed = euler_steps*dt;
+%         x_new = x + dt*f(0,x);
+%         % collect row vector of eig fun for each time
+%         phi2_time_euler =[phi2_time_euler, w2'*x0' + trapz(time_elapsed,exp(-l2*time_elapsed).*g2(x_new)',dim)];
+%         x = x_new;
+%     end
+%     % collect columns of phi1_time for each initial condition
+%     phi2_est_time_euler = [phi2_est_time_euler;phi2_time_euler];
+% 
+%     % usde ode45
+%     [t,x] = ode45(@(t,x)f(t,x),[0 100],x_0(i,:), options);
+%     phi2_est = [phi2_est, w2'*x_0(i,:)' + trapz(t,exp(-l2*t).*g2(x')')];
+% end
 
 for i = 1:length(x_0)
     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
@@ -90,12 +102,18 @@ for i = 1:length(x_0)
     end
     % collect columns of phi1_time for each initial condition
     phi2_est_time_ode45 = [phi2_est_time_ode45;phi2_time_ode45];
+
+    % test eigfun
+    [t,x] = ode45(@(t,x)f(t,x),[0 2],x_0(i,:), options);
+    %collect row vector of eig fun for each time
+    phi2_est = [phi2_est, w2'*x_0(i,:)' + trapz(t,exp(-l2*t).*g2(x')')];
 end
 
 
 F = findall(0,'type','figure','tag','TMWWaitbar');
 delete(F);
 
+%% reshape
 Phi11 = zeros(size(q1));
 Phi22 = zeros(size(q2));
 for i = 1:length(grid)
@@ -105,8 +123,8 @@ for i = 1:length(grid)
     end
 end
 phi2_est = reshape((phi2_est),size(q2));
-phi2_est_euler = phi2_est_time_euler(:,end);
-phi2_est_euler = reshape((phi2_est_euler),size(q2));
+% phi2_est_euler = phi2_est_time_euler(:,end);
+% phi2_est_euler = reshape((phi2_est_euler),size(q2));
 phi2_time_ode45 = phi2_est_time_ode45(:,end);
 phi2_time_ode45 = reshape((phi2_time_ode45),size(q2));
 
