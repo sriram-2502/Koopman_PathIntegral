@@ -1,9 +1,9 @@
 %% eigenfunctions for duffing system
-clc; clear; close all;
+clc; clear; %close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 %eqb_point_node = [-1 0];
-eqb_point = 1;
+eqb_point = -1;
 shift = -eqb_point;
 Dom = [-3 3];
 x = sym('x',[2;1]); 
@@ -65,7 +65,7 @@ phi1_matlab = []; phi2 = [];
 %     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 
 dim = 1;
-grid = Dom(1):0.01:Dom(2); %define grid where eigenfunction is well defined
+grid = Dom(1):0.025:Dom(2); %define grid where eigenfunction is well defined
 [q1,q2] = meshgrid(grid);
 x_0 = [q1(:)';q2(:)'];
 
@@ -73,7 +73,7 @@ x_0 = [q1(:),q2(:)];
 phi1_ode45_time_real = [];
 phi1_ode45_time_imag = [];
 options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
-time_to_simulate = 10;
+time_to_simulate = 5;
 t_ode45 = linspace(0.001,50,time_to_simulate);
 
 parfor i = 1:length(x_0)
@@ -125,8 +125,8 @@ phi1_ode45_time_mag = sqrt(phi1_ode45_time_real.^2+phi1_ode45_time_imag.^2);
 figure(1)
 
 % eigenfucntion 1 mag and phase
-subplot(2,4,1)
-p1 = pcolor(q1,q2,phi1_mag); hold on;
+subplot(2,4,7)
+p1 = pcolor(q1,q2,log(phi1_mag)); hold on;
 set(p1,'Edgecolor','none')
 colormap jet
 
@@ -144,7 +144,7 @@ box on
 axes.LineWidth=2;
 colorbar
 
-subplot(2,4,2)
+subplot(2,4,8)
 p2 = pcolor(q1,q2,phi1_phase); hold on;
 set(p2,'Edgecolor','none')
 colormap jet
@@ -165,11 +165,11 @@ colorbar
 %% Convergence plot
 figure(2)
 
-subplot(2,2,[1,2])
+subplot(2,2,[3,4])
 t_plot = t_ode45;
 phi1_convergence = reshape(phi1_ode45_time_mag,time_to_simulate,[]);
 for i = 1:1:length(x_0)
-    plot(t_plot,phi1_convergence(:,i)); hold on
+    plot(t_plot,phi1_convergence(:,i),'LineWidth',2); hold on
 end
 axes = gca;
 set(axes,'FontSize',15);

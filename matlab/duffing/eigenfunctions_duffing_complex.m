@@ -3,7 +3,7 @@ clc; clear; %close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 %eqb_point_node = [-1 0];
-eqb_point = 1;
+eqb_point = -1;
 shift = -eqb_point;
 Dom = [-3 3];
 
@@ -66,7 +66,7 @@ phi1_matlab = []; phi2 = [];
 
 parfor i = 1:length(x_0)
     %waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
-    tspan = [0 50];
+    tspan = [0 100];
     [t,x] = ode45(@(t,x)f_shifted(x(1),x(2)),tspan,x_0(i,:));
     
     % complex eigenfunctions at stable node (-1,0)
@@ -105,7 +105,7 @@ phi1_mag_log = log(phi1_mag);
 figure(1)
 
 % eigenfucntion 1 mag and phase
-subplot(2,4,1)
+subplot(2,4,5)
 p1 = pcolor(q1,q2,log(phi1_mag)); hold on;
 set(p1,'Edgecolor','none')
 colormap jet
@@ -124,7 +124,7 @@ box on
 axes.LineWidth=2;
 colorbar
 
-subplot(2,4,2)
+subplot(2,4,6)
 p2 = pcolor(q1,q2,phi1_phase); hold on;
 set(p2,'Edgecolor','none')
 colormap jet
