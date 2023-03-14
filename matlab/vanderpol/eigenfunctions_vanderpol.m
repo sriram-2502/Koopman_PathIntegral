@@ -66,13 +66,13 @@ f = matlabFunction(f);
 %% setup path integral
 dim = 1; % dimension for integraton (1 for scalar)
 
-w_bar = waitbar(0,'1','Name','Calcualting path integral...',...
-    'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
+% w_bar = waitbar(0,'1','Name','Calcualting path integral...',...
+%     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 
 % %define grid where eigenfunction is well defined
 % setup for eqb point at (0,0)
 bounds = 3;
-grid = -bounds:0.05:bounds; %define grid where eigenfunction is well defined
+grid = -bounds:0.025:bounds; %define grid where eigenfunction is well defined
 [q1,q2] = meshgrid(grid);
 U = f(q1(:)',q2(:)');
 
@@ -80,8 +80,8 @@ x_0 = [q1(:),q2(:)];
 phi1_real=[]; phi2_real=[];
 phi1_imag = []; phi2_imag = [];
 phi1_matlab = []; phi2 = [];
-for i = 1:length(x_0)
-    waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
+parfor i = 1:length(x_0)
+%     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
     tspan = [0 100];
     options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
     %options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
@@ -104,8 +104,8 @@ for i = 1:length(x_0)
     %phi2 = [phi2, w2'*x_0(i,:)' + trapz(t,exp(-l2*t).*g2(x(:,1),x(:,2)), dim)];
 end
 
-F = findall(0,'type','figure','tag','TMWWaitbar');
-delete(F);
+% F = findall(0,'type','figure','tag','TMWWaitbar');
+% delete(F);
 
 %% reshape
 % phi for eqb point at (0,0)
@@ -120,9 +120,9 @@ phi1_phase = angle(phi1_real + i*phi1_imag);
 phi1_phase2 = angle(real(phi1_matlab) + i*imag(phi1_matlab));
 phi1_mag_log = log(phi1_mag);
 
-%% plot
-figure(1)
-
+%% plot eigenfunctions
+figure(3)
+ic_pts = 1; Dom = [-0.1, 0.1]; tspan = [0,100];
 % eigenfucntion 1 mag and phase
 subplot(2,4,1)
 p1 = pcolor(q1,q2,phi1_mag); hold on;
@@ -133,9 +133,6 @@ l = streamslice(X,Y,u,v); hold on;
 set(l,'LineWidth',1)
 set(l,'Color','k');
 ff = @(t,x)[alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
-tspan = [0,10]; ic_pts = 8;
-xl = Dom(1); xh = Dom(2);
-yl = Dom(1); yh = Dom(2);
 for x0 = linspace(Dom(1), Dom(2), ic_pts)
     for y0 = linspace(Dom(1), Dom(2), ic_pts)
         [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
@@ -154,17 +151,13 @@ axes.LineWidth=2;
 colorbar
 
 subplot(2,4,2)
-p2 = pcolor(q1,q2,phi1_mag_matlab); hold on;
+p2 = pcolor(q1,q2,phi1_phase); hold on;
 set(p2,'Edgecolor','none')
 colormap jet
-
 l = streamslice(X,Y,u,v); hold on;
 set(l,'LineWidth',1)
 set(l,'Color','k');
 ff = @(t,x)[alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
-tspan = [0,10]; ic_pts = 8;
-xl = Dom(1); xh = Dom(2);
-yl = Dom(1); yh = Dom(2);
 for x0 = linspace(Dom(1), Dom(2), ic_pts)
     for y0 = linspace(Dom(1), Dom(2), ic_pts)
         [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
@@ -181,65 +174,6 @@ ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
 box on
 axes.LineWidth=2;
 colorbar
-
-% subplot(2,4,5)
-% p1 = pcolor(q1,q2,phi1_mag_log); hold on;
-% set(p1,'Edgecolor','none')
-% colormap jet
-% 
-% l = streamslice(X,Y,u,v); hold on;
-% set(l,'LineWidth',1)
-% set(l,'Color','k');
-% ff = @(t,x)[alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
-% tspan = [0,10]; ic_pts = 8;
-% xl = Dom(1); xh = Dom(2);
-% yl = Dom(1); yh = Dom(2);
-% for x0 = linspace(Dom(1), Dom(2), ic_pts)
-%     for y0 = linspace(Dom(1), Dom(2), ic_pts)
-%         [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
-%         plot(xs(:,1),xs(:,2),'k','LineWidth',1); hold on;
-%     end
-% end
-% xlim([-3,3])
-% ylim([-3,3])
-% axes = gca;
-% axis square
-% set(axes,'FontSize',15);
-% xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
-% ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-% box on
-% axes.LineWidth=2;
-% colorbar
-% 
-% subplot(2,4,6)
-% p2 = pcolor(q1,q2,log(phi1_mag_matlab)); hold on;
-% set(p2,'Edgecolor','none')
-% colormap jet
-% 
-% l = streamslice(X,Y,u,v); hold on;
-% set(l,'LineWidth',1)
-% set(l,'Color','k');
-% ff = @(t,x)[alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
-% tspan = [0,10]; ic_pts = 8;
-% xl = Dom(1); xh = Dom(2);
-% yl = Dom(1); yh = Dom(2);
-% for x0 = linspace(Dom(1), Dom(2), ic_pts)
-%     for y0 = linspace(Dom(1), Dom(2), ic_pts)
-%         [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
-%         plot(xs(:,1),xs(:,2),'k','LineWidth',1); hold on;
-%     end
-% end
-% xlim([-3,3])
-% ylim([-3,3])
-% axes = gca;
-% axis square
-% set(axes,'FontSize',15);
-% xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
-% ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-% box on
-% axes.LineWidth=2;
-% colorbar
-
 %% helper functions
 
 function [value,isterminal,direction]=offFrame(~, Y, Dom)
