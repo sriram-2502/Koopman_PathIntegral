@@ -1,12 +1,12 @@
 %% eigenfunctions for duffing system
-clc; clear; close all;
+clc; clear; %close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 % linearization at (0,0) saddle
 Dom = [-2 2];
 x = sym('x',[2;1]); 
-delta = 0.5;
-f = [x(2); + x(1) - delta*x(2) - x(1)^3 ]; 
+delta = 0.5; scaling = 1;
+f = [x(2); + x(1) - delta*x(2) - scaling.*x(1)^3 ]; 
 
 % get quiver
 [X,Y] = meshgrid(Dom(1):0.25:Dom(2),Dom(1):0.25:Dom(2));
@@ -48,50 +48,21 @@ options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Do
 
 for i = 1:length(x_0)
     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
-    tspan = [0 10];
+    tspan = [0 5];
     
     [t,x] = ode45(@(t,x)f(x(1),x(2)),tspan,x_0(i,:), options);
     
-    % terminate t and x when they enter linear region
-%     idx = find(norm(x(end,:)-eqb_point_saddle)<1e-6);
-%     if(~isempty(idx))
-%         idx = idx(1);
-%         t = t(1:idx); x = x(1:idx,:);
-%     end
-
     % stable eigenfunctions at saddle point (0,0)
     phi1 = [phi1, w1'*x_0(i,:)' + trapz(t,exp(-eig_val1*t).*g1(x(:,1),x(:,2)),dim)];
 
     % unstable eigenfunctions at saddle point (0,0)
     phi2 = [phi2, w2'*x_0(i,:)' + trapz(t,exp(-eig_val2*t).*g2(x(:,1),x(:,2)),dim)];
+
 end
 F = findall(0,'type','figure','tag','TMWWaitbar');
 delete(F);
 
-% w_bar = waitbar(0,'1','Name','Calcualting path integral...',...
-%     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
-% for i = 1:length(x_0)
-%     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
-%     tspan = [0 5];
-%     options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
-%     %options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
-%     %options = odeset('RelTol',1e-9,'AbsTol',1e-300);
-%     [t,x] = ode45(@(t,x)f(x(1),x(2)),tspan,x_0(i,:), options);
-%     
-%     % terminate t and x when they enter linear region
-
-%     idx = find(norm(x(end,:)-eqb_point_saddle)<1e-6);
-%     if(~isempty(idx))
-%         idx = idx(1);
-%         t = t(1:idx); x = x(1:idx,:);
-%     end
-%     % unstable eigenfunctions at saddle point (0,0)
-%     phi2 = [phi2, w2'*x_0(i,:)' + trapz(t,exp(-eig_val2*t).*g2(x(:,1),x(:,2)),dim)];
-% end
-% F = findall(0,'type','figure','tag','TMWWaitbar');
-% delete(F);
-
-
+%% reshape
 % phi for saddle at (0,0)
 phi1 = reshape((phi1),size(q2)); %phi1_saddle(phi1_saddle>10)=10;
 phi2 = reshape((phi2),size(q2)); %phi2_saddle(phi2_saddle>10)=10;
@@ -162,14 +133,14 @@ xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
 %title ('Unstable eigenfunction $\psi_2(x)$ at (0,0)','FontSize',20, 'Interpreter','latex')
 colorbar
-%clim([-5e-4, 5e-4])
+clim([-5e-4,5e-4])
 box on
 axes.LineWidth=2;
 
 %% zero level set
 phi2_level_set = phi2;
-phi2_level_set(abs(phi2_level_set)<10e-3)=0;
-phi2_level_set(abs(phi2_level_set)>10e-3)=-100;
+phi2_level_set(abs(phi2_level_set)<10-5)=0;
+phi2_level_set(abs(phi2_level_set)>10e-4)=-100;
 
 subplot(2,2,4)
 p2 = pcolor(q1,q2,phi2_level_set); hold on;

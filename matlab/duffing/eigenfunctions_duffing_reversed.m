@@ -1,9 +1,9 @@
 %% eigenfunctions for duffing system
-clc; clear; %close all;
+clc; clear; close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 % linearization at (0,0) saddle
-Dom = [-2 2];
+Dom = [-1 1];
 x = sym('x',[2;1]); 
 delta = 0.5;
 f = -[x(2); + x(1) - delta*x(2) - x(1)^3 ]; 
@@ -19,7 +19,7 @@ l = streamslice(X,Y,u,v); hold on;
 set(l,'LineWidth',1)
 set(l,'Color','k');
 ff = @(t,x)[x(2); + x(1) - delta*x(2) - x(1)^3]; 
-tspan = [0,10]; ic_pts = 8;
+tspan = [0,10]; ic_pts = 2;
 xl = Dom(1); xh = Dom(2);
 yl = Dom(1); yh = Dom(2);
 for x0 = linspace(Dom(1), Dom(2), ic_pts)
@@ -76,15 +76,8 @@ options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Do
 
 for i = 1:length(x_0)
     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
-    tspan = [0 10];
+    tspan = [0 50];
     [t,x] = ode45(@(t,x)f(x(1),x(2)),tspan,x_0(i,:), options);
-    
-    % terminate t and x when they enter linear region
-%     idx = find(norm(x(end,:)-eqb_point_saddle)<1e-6);
-%     if(~isempty(idx))
-%         idx = idx(1);
-%         t = t(1:idx); x = x(1:idx,:);
-%     end
 
     % stable eigenfunctions at saddle point (0,0)
     phi1 = [phi1, w1'*x_0(i,:)' + trapz(t,exp(-eig_val1*t).*g1(x(:,1),x(:,2)),dim)];
@@ -94,29 +87,6 @@ for i = 1:length(x_0)
 end
 F = findall(0,'type','figure','tag','TMWWaitbar');
 delete(F);
-
-% w_bar = waitbar(0,'1','Name','Calcualting path integral...',...
-%     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
-% for i = 1:length(x_0)
-%     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
-%     tspan = [0 20];
-%     %options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
-%     %options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
-%     options = odeset('RelTol',1e-9,'AbsTol',1e-300);
-%     [t,x] = ode45(@(t,x)f(x(1),x(2)),tspan,x_0(i,:),options);
-%     
-%     % terminate t and x when they enter linear region
-%     idx = find(norm(x(end,:)-eqb_point_saddle)<1e-6);
-%     if(~isempty(idx))
-%         idx = idx(1);
-%         t = t(1:idx); x = x(1:idx,:);
-%     end
-% 
-%     % unstable eigenfunctions at saddle point (0,0)
-%     phi2 = [phi2, w2'*x_0(i,:)' + trapz(t,exp(-eig_val2*t).*g2(x(:,1),x(:,2)),dim)];
-% end
-% F = findall(0,'type','figure','tag','TMWWaitbar');
-% delete(F);
 
 %% resize
 % phi for saddle at (0,0)
@@ -151,14 +121,12 @@ axis([-bounds bounds -bounds bounds])
 set(axes1,'FontSize',15);
 xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-%title ('Stable Eigenfunction $\psi_1(x)$ at (0,0)','FontSize',20, 'Interpreter','latex')
 colorbar
-%clim([-5e10, 5e10])
 box on
 axes1.LineWidth=2;
 
 subplot(2,2,2)
-% remove max and min value from the eqb points (-1,0) and (1,0)
+%remove max and min value from the eqb points (-1,0) and (1,0)
 % [min_val, min_idx] = min(phi2,[],'all');
 % [r,c] = ind2sub(size(q1), min_idx);
 % phi2(r,c) = nan;
@@ -166,8 +134,7 @@ subplot(2,2,2)
 % [r,c] = ind2sub(size(q1), max_idx);
 % phi2(r,c) = nan;
 
-
-p2 = pcolor(q1,q2,log(phi2_shifted)); hold on;
+p2 = pcolor(q1,q2,phi2); hold on;
 set(p2,'Edgecolor','none')
 colormap jet
 l = streamslice(X,Y,u,v); hold on;
@@ -189,9 +156,7 @@ axis([-bounds bounds -bounds bounds])
 set(axes2,'FontSize',15);
 xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-%title ('Unstable eigenfunction $\psi_2(x)$ at (0,0)','FontSize',20, 'Interpreter','latex')
 colorbar
-%clim([-5e-4, 5e-4])
 box on
 axes2.LineWidth=2;
 
