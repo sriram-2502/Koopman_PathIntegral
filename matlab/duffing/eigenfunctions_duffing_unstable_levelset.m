@@ -1,5 +1,5 @@
 %% eigenfunctions for duffing system
-clc; clear; close all;
+clc; clear; %close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 % linearization at (0,0) saddle
@@ -31,8 +31,8 @@ f = matlabFunction(f);
 
 %% setup path integral for saddle point at (0,0)
 dim = 1; % dimension for integraton (1 for scalar)
-bounds = Dom(2);
-grid = -bounds:0.01:bounds; %define grid where eigenfunction is well defined
+bounds = Dom(2); ds = 0.025;
+grid = -bounds:ds:bounds; %define grid where eigenfunction is well defined
 [q1,q2] = meshgrid(grid);
 
 x_0 = [q1(:),q2(:)]; 
@@ -46,7 +46,7 @@ options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Do
 %options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
 %options = odeset('RelTol',1e-9,'AbsTol',1e-300);
 
-tspan = [0 10];
+tspan = [0 5];
 parfor i = 1:length(x_0)
 %     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
     [t,x] = ode45(@(t,x)f(x(1),x(2)),tspan,x_0(i,:), options);
@@ -75,7 +75,7 @@ phi2(r,c) = nan;
 ic_pts = 1;
 figure(2)
 subplot(2,4,1)
-p1 = pcolor(q1,q2,phi2); hold on;
+p1 = pcolor(q1,q2,phi2.*1e4); hold on;
 set(p1,'Edgecolor','none')
 colormap jet
 
@@ -105,27 +105,31 @@ box on
 axes.LineWidth=2;
 
 %% zero level set
+%threshold = 5e-5; % good one for ds = 0.01 discretization
+threshold = 4e-3; % best for ds = 0.025
 phi2_level_set = phi2;
-phi2_level_set(abs(phi2_level_set)<5e-5)=0;
-phi2_level_set(abs(phi2_level_set)>5e-5)=-100;
+phi2_level_set(abs(phi2_level_set)<threshold)=0;
+phi2_level_set(abs(phi2_level_set)>threshold)=-100;
 
 [y_zero,x_zero] = find(phi2_level_set==0);
-y_zero = y_zero * 0.01 - 2;
-x_zero = x_zero * 0.01 - 2;
+% scale it to the correct domain
+y_zero = y_zero * ds - Dom(2);
+x_zero = x_zero * ds - Dom(2);
 
 p = polyfit(x_zero, y_zero, 6);
 val = polyval(p, x_zero);
 
 subplot(2,4,2)
 p2 = pcolor(q1,q2,phi2_level_set); hold on;
+colorbar
 set(p2,'Edgecolor','none')
 colormap jet
 l = streamslice(X,Y,u,v); hold on;
 set(l,'LineWidth',1)
 set(l,'Color','k');
-sz = 25;
-scatter(x_zero,y_zero,sz,'MarkerEdgeColor','yellow','MarkerFaceColor','yellow')
-plot(x_zero,val,'Color','yellow');
+sz = 10;
+scatter(x_zero(7:end-7),y_zero(7:end-7),sz,'MarkerEdgeColor','yellow','MarkerFaceColor','yellow')
+%plot(x_zero,val,'Color','yellow');
 
 axes2 = gca;
 axis square
@@ -133,9 +137,7 @@ axis([-bounds bounds -bounds bounds])
 set(axes2,'FontSize',15);
 xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-%title ('Unstable eigenfunction $\psi_2(x)$ at (0,0)','FontSize',20, 'Interpreter','latex')
-colorbar
-%clim([-5e-4, 5e-4])
+%title ('Threshold: '+string(threshold),'FontSize',20, 'Interpreter','latex')
 box on
 axes.LineWidth=2;
 
