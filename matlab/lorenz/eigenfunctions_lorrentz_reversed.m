@@ -43,6 +43,8 @@ xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
 zlabel('$x_3$','FontSize',20, 'Interpreter','latex')
 box on
+grid on
+view(35,20)
 axes.LineWidth=2;
 
 %% linearization at (0,0,0) saddle
@@ -76,26 +78,28 @@ bounds = Dom(2);
 q1 = Xs(:,1); q2 = Xs(:,2); q3 = Xs(:,3);
 x_0 = [q1(:),q2(:),q3(:)]; 
 phi1=[]; phi2=[]; phi3=[];
-tspan = [0,20];
+tspan = [0,10];
+% options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
+options = odeset('RelTol',1e-9,'AbsTol',1e-300);
+
 parfor i = 1:length(x_0)
-    [t,x] = ode45(@(t,x)f(x(1),x(2),x(3)),tspan,x_0(i,:));
+    [t,x] = ode45(@(t,x)f(x(1),x(2),x(3)),tspan,x_0(i,:),options);
     
     % path integral for complex eigenfunctions
-    % real part
     phi2 = [phi2, w2_real'*x_0(i,:)' +...
         trapz(t,exp(-eig_val2*t).*g2(x(:,1),x(:,2),x(:,3)),dim)];
 end
 
-tspan = [-200 0];
+tspan = [-100 0];
 parfor i = 1:length(x_0)    
-    [t,x] = ode45(@(t,x)f(x(1),x(2),x(3)),tspan,x_0(i,:));
-    % real part
+    [t,x] = ode45(@(t,x)f(x(1),x(2),x(3)),tspan,x_0(i,:),options);
     phi1 = [phi1, (w1_real'*x_0(i,:)' -...
         trapz(t,exp(-eig_val1*t).*g1(x(:,1),x(:,2),x(:,3)),dim))./1e-10];
 
     phi3 = [phi3, w3_real'*x_0(i,:)' -...
         trapz(t,exp(-eig_val3*t).*g3(x(:,1),x(:,2),x(:,3)),dim)];
 end
+
 % phi1(phi1>1e6)=1e6;
 % phi1(phi1<-1e6)=-1e6;
 phi3(phi3>1e6)=1e6;
@@ -109,63 +113,45 @@ phi3 = reshape((phi3),size(q2));
 %% scatter plot
 figure(1)
 sz = 10; ic_pts = 5; alpha = 1;
-subplot(2,2,2)
+subplot(2,4,2)
 Xs = [];
-scatter3(q1(:),q2(:),q3(:),sz,phi1(:),'filled','MarkerFaceAlpha',alpha); hold on;
-% for x0 = linspace(Dom(1), Dom(2), ic_pts)
-%     for y0 = linspace(Dom(1), Dom(2), ic_pts)
-%         for z0 = linspace(Dom(1), Dom(2), ic_pts)
-%             [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0 z0]);
-%             plot3(xs(start_idx:end,1),xs(start_idx:end,2),xs(start_idx:end,3),'k','LineWidth',1); hold on;
-%         end
-%     end
-% end
+scatter3(q1(:),q2(:),q3(:),sz,phi2(:).*1e4,'filled','MarkerFaceAlpha',alpha); hold on;
 axes1 = gca;
 axis square
 % %axis([-bounds bounds -bounds bounds])
 set(axes1,'FontSize',15);
 xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-colorbar
+zlabel('$x_3$','FontSize',20, 'Interpreter','latex')
+colorbar('southoutside')
 box on
+view(35,20)
 axes1.LineWidth=2;
 
-subplot(2,2,3)
-scatter3(q1(:),q2(:),q3(:),sz,phi2(:),'filled','MarkerFaceAlpha',alpha); hold on;
-% for x0 = linspace(Dom(1), Dom(2), ic_pts)
-%     for y0 = linspace(Dom(1), Dom(2), ic_pts)
-%         for z0 = linspace(Dom(1), Dom(2), ic_pts)
-%             [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0 z0]);
-%             plot3(xs(start_idx:end,1),xs(start_idx:end,2),xs(start_idx:end,3),'k','LineWidth',1); hold on;
-%         end
-%     end
-% end
+subplot(2,4,5)
+scatter3(q1(:),q2(:),q3(:),sz,phi1(:).*1e-11,'filled','MarkerFaceAlpha',alpha); hold on;
 axes2 = gca;
 axis square
 % %axis([-bounds bounds -bounds bounds])
 set(axes2,'FontSize',15);
 xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-colorbar
+zlabel('$x_3$','FontSize',20, 'Interpreter','latex')
+colorbar('southoutside')
 box on
+view(35,20)
 axes2.LineWidth=2;
 
-subplot(2,2,4)
-scatter3(q1(:),q2(:),q3(:),sz,phi3(:),'filled','MarkerFaceAlpha',alpha); hold on;
-% for x0 = linspace(Dom(1), Dom(2), ic_pts)
-%     for y0 = linspace(Dom(1), Dom(2), ic_pts)
-%         for z0 = linspace(Dom(1), Dom(2), ic_pts)
-%             [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0 z0]);
-%             plot3(xs(start_idx:end,1),xs(start_idx:end,2),xs(start_idx:end,3),'k','LineWidth',1); hold on;
-%         end
-%     end
-% end
+subplot(2,4,6)
+scatter3(q1(:),q2(:),q3(:),sz,phi3(:).*1e-1,'filled','MarkerFaceAlpha',alpha); hold on;
 axes3 = gca;
 axis square
 % %axis([-bounds bounds -bounds bounds])
 set(axes3,'FontSize',15);
 xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-colorbar
+zlabel('$x_3$','FontSize',20, 'Interpreter','latex')
+colorbar('southoutside')
 box on
+view(35,20)
 axes3.LineWidth=2;

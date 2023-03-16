@@ -1,11 +1,11 @@
 %% eigenfunctions for vanderpol system
-clc; clear; close all;
+clc; clear; %close all;
 %% system description
 % nonlinear ode x_dot = f(x)
-Dom = [-4 4]; ds = 0.07;
+Dom = [-4 4];
 x = sym('x',[2;1]); 
 mu = 1;
-alpha = 1;
+alpha = -1;
 f = [alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))]; 
 
 % get quiver
@@ -80,27 +80,27 @@ x_0 = [q1(:),q2(:)];
 phi1_real=[]; phi2_real=[];
 phi1_imag = []; phi2_imag = [];
 phi1_matlab = []; phi2 = [];
+options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
+%options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
+%options = odeset('RelTol',1e-9,'AbsTol',1e-300);
+tspan = [-20 0];
 parfor i = 1:length(x_0)
 %     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
-    tspan = [0 100];
-    options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
-    %options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
-    %options = odeset('RelTol',1e-9,'AbsTol',1e-300);
+    
     [t,x] = ode45(@(t,x)f(x(1),x(2)),tspan,x_0(i,:),options);
-
     % path integral for complex eigenfunctions
     % real part
-    phi1_real = [phi1_real, w1_real'*x_0(i,:)' +...
+    phi1_real = [phi1_real, w1_real'*x_0(i,:)' -...
         trapz(t,exp(-eig_val1_real*t).*(cos(eig_val1_imag*t).*g1_real(x(:,1),x(:,2) ...
             +sin(eig_val1_imag*t)).*g1_imag(x(:,1),x(:,2))),dim)];
 
     % imaginary part
-    phi1_imag = [phi1_imag, w1_imag'*x_0(i,:)' +...
+    phi1_imag = [phi1_imag, w1_imag'*x_0(i,:)' -...
         trapz(t,exp(-eig_val1_real*t).*(cos(eig_val1_imag*t).*g1_imag(x(:,1),x(:,2)) ...
         -sin(eig_val1_imag*t).*g1_real(x(:,1),x(:,2))),dim)];
 
     % compute directly
-    phi1_matlab = [phi1_matlab, w1'*x_0(i,:)' + trapz(t,exp(-l1*t).*g1(x(:,1),x(:,2)), dim)];
+    phi1_matlab = [phi1_matlab, w1'*x_0(i,:)' - trapz(t,exp(-l1*t).*g1(x(:,1),x(:,2)), dim)];
     %phi2 = [phi2, w2'*x_0(i,:)' + trapz(t,exp(-l2*t).*g2(x(:,1),x(:,2)), dim)];
 end
 
@@ -124,7 +124,7 @@ phi1_mag_log = log(phi1_mag);
 figure(3)
 ic_pts = 1; Dom = [-0.1, 0.1]; tspan = [0,100];
 % eigenfucntion 1 mag and phase
-subplot(2,4,1)
+subplot(2,4,5)
 p1 = pcolor(q1,q2,phi1_mag); hold on;
 set(p1,'Edgecolor','none')
 colormap jet
@@ -150,7 +150,7 @@ box on
 axes.LineWidth=2;
 colorbar
 
-subplot(2,4,2)
+subplot(2,4,6)
 p2 = pcolor(q1,q2,phi1_phase); hold on;
 set(p2,'Edgecolor','none')
 colormap jet
