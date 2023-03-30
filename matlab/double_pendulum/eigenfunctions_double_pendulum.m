@@ -1,5 +1,5 @@
 clc; clear; close all;
-load('matlab_matrix.mat')
+load('robotic_arm_stable.mat')
 
 %% get mag and phase
 phi_mag = sqrt(Eigfunc(:,:,1).^2 + Eigfunc(:,:,2).^2);
