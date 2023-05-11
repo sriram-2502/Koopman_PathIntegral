@@ -7,26 +7,10 @@ set(0,'defaultfigurecolor',[1 1 1])
 %% set up the system for positive lambda2
 Dom = [-0.9 0.9]; ds = 0.05;
 
-% sys 1
-% a1 =1; a2=1;
-% f = @(t, x) [-2*a2*x(2,:).*(x(1,:).^2-x(2,:)-2*x(1,:).*x(2,:).^2+x(2,:).^4)+  ...
-%                    a1*(x(1,:)+4*x(1,:).^2.*x(2,:)-x(2,:).^2-8*x(1,:).*x(2,:).^3+4*x(2,:).^5)
-%            2*a1*(x(1,:)-x(2,:).^2).^2-a2*( x(1,:).^2-x(2,:)-2*x(1,:).*x(2,:).^2+x(2,:).^4 )  ];
-% 
-% % get quiver
-% [X,Y] = meshgrid(Dom(1):0.05:Dom(2),Dom(1):0.05:Dom(2));
-% u = -2*a2*Y.*(X.^2-Y-2*X.*Y.^2+Y.^4)+  ...
-%                    a1*(X+4*X.^2.*Y-Y.^2-8*X.*Y.^3+4*Y.^5);
-% v = 2*a1*(X-Y.^2).^2-a2*(X.^2-Y-2*X.*Y.^2+Y.^4);
-% 
-% % true eig functions
-% phi1 = @(x) x(1,:)-x(2,:).^2;
-% phi2 = @(x) -x(1,:).^2+x(2,:)+2*x(1,:).*x(2,:).^2-x(2,:).^4;
-% x = sym('x',[2;1], 'real');
-% Phi = @(x)[phi1(x);phi2(x)];
-
 %sys 2
-f = @(t, x) [x(1,:)-x(1,:).^3; -2*(x(2,:)-x(2,:).^3)];
+lambda1 = -1;
+lambda2 = -2;
+f = @(t, x) [lambda1*(x(1,:)-x(1,:).^3); lambda2*(x(2,:)-x(2,:).^3)];
 
 % get quiver
 [X,Y] = meshgrid(Dom(1):0.05:Dom(2),Dom(1):0.05:Dom(2));
@@ -34,8 +18,8 @@ u = X-X.^2;
 v = -Y+Y.^3;
 
 % true eig functions
-phi1 = @(x) 2*x(2,:)./sqrt(1-x(2,:)^2); % for l1 = -1
-phi2 = @(x) -x(1,:)./sqrt(1-x(1,:)^2); % for l2 = 1
+phi1 = @(x) -lambda2*x(2,:)./sqrt(1-x(2,:)^2); % for l1 = -2
+phi2 = @(x) -lambda1*x(1,:)./sqrt(1-x(1,:)^2); % for l2 = -1
 x = sym('x',[2;1], 'real');
 Phi = @(x)[phi1(x);phi2(x)];
 
