@@ -7,8 +7,8 @@ set(0,'defaultfigurecolor',[1 1 1])
 %% set up the system for positive lambda2
 Dom = [-2 2]; ds = 0.05;
 
-lambda1=-4; lambda2=-3;
 % sys 1
+lambda1=-4; lambda2=-3;
 f = @(t, x) [lambda1*x(1,:); (lambda2*x(2,:)-x(1,:).^2)];
 beta=1/(2*lambda1-lambda2); % for x2  
 
@@ -21,7 +21,7 @@ beta=1/(2*lambda1-lambda2); % for x2
 u = (lambda1.*X);
 v = (lambda2.*Y-X.^2);
 
-% true eig functions
+% true eig functions - sys 1 and 2
 phi1 = @(x) x(1,:);
 phi2 = @(x) x(2,:)+beta*x(1,:).^2;
 x = sym('x',[2;1], 'real');
