@@ -26,10 +26,10 @@ x = sym('x',[2;1], 'real');
 
 % sys 2
 % https://epubs.siam.org/doi/pdf/10.1137/17M116207X
-% for both negative: for path integrals if a1 < a2 (a1=-2;a2=-1)
-% for both positive: path integral works for a1 only; doesnt work for a2 (a1=2;a2=1)
-% for saddle case: path integral works as long as a1<0 and a2>0 (a1=-4;a2=3)
-a1=-4; a2=3;
+% for both negative: a1 < a2 for path integral to work (a1=-2;a2=-1)
+% for both positive: path integral works for a1 only (a1=2;a2=1)
+% for saddle case: 
+a1=2; a2=-1;
 f = @(t, x) [-2*a2*x(2,:).*(x(1,:).^2-x(2,:)-2*x(1,:).*x(2,:).^2+x(2,:).^4) +  ...
                    a1*(x(1,:)+4*x(1,:).^2.*x(2,:)-x(2,:).^2-8*x(1,:).*x(2,:).^3+4*x(2,:).^5);
            2*a1*(x(1,:)-x(2,:).^2).^2-a2*(x(1,:).^2-x(2,:)-2*x(1,:).*x(2,:).^2+x(2,:).^4 )];
