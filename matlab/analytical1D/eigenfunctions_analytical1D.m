@@ -6,16 +6,18 @@ set(0,'defaultfigurecolor',[1 1 1])
 
 %% set up the system for positive lambda2
 % sys 1
-lambda1 = -1;
-f = @(t, x) [lambda1*x(1,:)+x(1,:).^3];
+% lambda1 = -1;
+% f = @(t, x) [lambda1*x(1,:)+x(1,:).^3];
+% % true eig functions
+% x = sym('x', 'real');
+% phi = @(x) -lambda1*x(1,:)/sqrt(1-x(1,:).^2);
 
 %sys 2
-% lambda1 = -1;
-% f = @(t, x) [lambda1*(x(1,:)-x(1,:).^3)];
-
+f = @(t, x) [(x(1,:)-x(1,:).^3)];
 % true eig functions
 x = sym('x', 'real');
-phi = @(x) -lambda1*x(1,:)/sqrt(1-x(1,:).^2);
+phi = @(x) x(1,:)/sqrt(1-x(1,:).^2);
+
 
 %% linearize the system
 A = double(subs(jacobian(f(0,x),x),x,[0]));
@@ -37,20 +39,23 @@ x_0 = [grid(:)]; phi_est=[];
 %options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
 options = odeset('RelTol',1e-9,'AbsTol',1e-300);
 
+
+% t_span = [-1 0];
 t_span = [0 10];
+
 parfor i = 1:length(x_0)
     % usde ode45 to test eig funs
     [t,x] = ode45(@(t,x)f(t,x),t_span,x_0(i,:),options);
 
     %for forward time
-    % phi_est = [phi_est, w'*x_0(i,:)' + trapz(t,exp(-l*t).*g(x')',dim)];
+    phi_est = [phi_est, w'*x_0(i,:)' + trapz(t,exp(-l*t).*g(x')',dim)];
 
     % for negative time
-    phi_est = [phi_est, w'*x_0(i,:)' - trapz(t,exp(-l*t).*g(x')',dim)];
+    % phi_est = [phi_est, w'*x_0(i,:)' - trapz(t,exp(-l*t).*g(x')',dim)];
     % phi_est = [phi_est, trapz(t,exp(-l*t).*g(x')',dim)];
 
     % for flow reversed
-    %phi_est = [phi_est, w'*x_0(i,:)' + trapz(t,exp(-l*t).*g(x')',dim)];
+    % phi_est = [phi_est, w'*x_0(i,:)' + trapz(t,exp(-l*t).*g(x')',dim)];
 end
 
 %% get true eig funs
