@@ -41,7 +41,7 @@ options = odeset('RelTol',1e-9,'AbsTol',1e-300);
 
 
 % t_span = [-1 0];
-t_span = [0 10];
+t_span = [0 -10];
 
 parfor i = 1:length(x_0)
     % usde ode45 to test eig funs
