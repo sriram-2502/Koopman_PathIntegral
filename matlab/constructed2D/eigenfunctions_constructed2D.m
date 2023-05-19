@@ -18,8 +18,8 @@ u = X-X.^2;
 v = -Y+Y.^3;
 
 % true eig functions
-phi1 = @(x) -lambda2*x(2,:)./sqrt(1-x(2,:)^2); % for l1 = -2
-phi2 = @(x) -lambda1*x(1,:)./sqrt(1-x(1,:)^2); % for l2 = -1
+phi1 = @(x) x(1,:)./sqrt(1-x(1,:)^2);
+phi2 = @(x) x(2,:)./sqrt(1-x(2,:)^2);
 x = sym('x',[2;1], 'real');
 Phi = @(x)[phi1(x);phi2(x)];
 
@@ -48,7 +48,7 @@ parfor i = 1:length(x_0)
     phi1_est = [phi1_est, w1'*x_0(i,:)' + trapz(t,exp(-l1*t).*g1(x')')];
 end
 
-tspan = [0 50]; % for positive time
+tspan = [0 20]; % for positive time
 parfor i = 1:length(x_0)
     [t,x] = ode45(@(t,x)f(t,x),tspan,x_0(i,:),options);
     phi2_est = [phi2_est, w2'*x_0(i,:)' + trapz(t,exp(-l2*t).*g2(x')')];
