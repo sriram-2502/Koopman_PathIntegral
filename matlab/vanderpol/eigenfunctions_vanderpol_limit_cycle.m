@@ -1,11 +1,10 @@
-%% eigenfunctions for vanderpol system
+%% eigenfunctions for vanderpol system with unstable origin
 clc; clear; close all;
 set(0,'DefaultLineLineWidth',2) %linewidh on plots
 set(0,'defaultfigurecolor',[1 1 1])
-
 %% system description
 % nonlinear ode x_dot = f(x)
-Dom = [-4 4];
+Dom = [-1 1];
 x = sym('x',[2;1]); 
 mu = 1;
 alpha = 1;
@@ -16,30 +15,18 @@ f = [alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
 u = alpha.*Y;
 v = alpha.*(mu.*Y - X - mu.*X.^2.*Y);
 
-%figure(1)
-%subplot(2,4,1)
-% l = streamslice(X,Y,u,v); hold on;
-% set(l,'LineWidth',1)
-% set(l,'Color','k');
-% ff = @(t,x)[alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
-% tspan = [0,10]; ic_pts = 8;
-% xl = Dom(1); xh = Dom(2);
-% yl = Dom(1); yh = Dom(2);
-% for x0 = linspace(Dom(1), Dom(2), ic_pts)
-%     for y0 = linspace(Dom(1), Dom(2), ic_pts)
-%         [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
-%         plot(xs(:,1),xs(:,2),'k','LineWidth',1); hold on;
-%     end
-% end
-% xlim([-3,3])
-% ylim([-3,3])
-% axes = gca;
-% axis square
-% set(axes,'FontSize',15);
-% xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
-% ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-% box on
-% axes.LineWidth=2;
+
+ff = @(t,x)[-alpha*x(2); -alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
+tspan = [0,10]; ic_pts = 10;
+xl = Dom(1); xh = Dom(2);
+yl = Dom(1); yh = Dom(2);
+Xs = [];
+for x0 = linspace(Dom(1), Dom(2), ic_pts)
+    for y0 = linspace(Dom(1), Dom(2), ic_pts)
+        [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
+        Xs = [Xs;xs];
+    end
+end
 
 %% linearization at (0,0) unstable
 eqb_point = [0 0];
@@ -74,11 +61,11 @@ dim = 1; % dimension for integraton (1 for scalar)
 
 % %define grid where eigenfunction is well defined
 % setup for eqb point at (0,0)
-bounds = 3;
-grid = -bounds:0.025:bounds; %define grid where eigenfunction is well defined
-[q1,q2] = meshgrid(grid);
-U = f(q1(:)',q2(:)');
+% bounds = 3;
+% grid = -bounds:0.025:bounds; %define grid where eigenfunction is well defined
+% [q1,q2] = meshgrid(grid);
 
+q1 = Xs(:,1); q2 = Xs(:,2);
 x_0 = [q1(:),q2(:)]; 
 phi1_real=[]; phi2_real=[];
 phi1_imag = []; phi2_imag = [];
@@ -86,6 +73,7 @@ phi1_matlab = []; phi2 = [];
 options = odeset('RelTol',1e-9,'AbsTol',1e-300,'events',@(t, x)offFrame(t, x, Dom(2)));
 %options = odeset('events',@(t, x)offFrame(t, x, Dom(2)));
 %options = odeset('RelTol',1e-9,'AbsTol',1e-300);
+% tspan = [-20 0];
 tspan = [0 20];
 parfor i = 1:length(x_0)
 %     waitbar(i/length(x_0),w_bar,sprintf(string(i)+'/'+string(length(x_0))))
@@ -117,68 +105,26 @@ phi1_imag = reshape((phi1_imag),size(q2));
 phi1_matlab = reshape((phi1_matlab),size(q2));
 
 phi1_mag  = sqrt(phi1_real.^2+phi1_imag.^2);
-% phi1_mag_matlab = sqrt(real(phi1_matlab).^2+imag(phi1_matlab).^2);
-phi1_mag_matlab = abs(phi1_matlab);
+phi1_mag_matlab = sqrt(real(phi1_matlab).^2+imag(phi1_matlab).^2);
 
 phi1_phase = angle(phi1_real + i*phi1_imag);
-% phi1_phase_matlab = angle(real(phi1_matlab) + i*imag(phi1_matlab));
-phi1_phase_matlab = angle(phi1_matlab);
+phi1_phase2 = angle(real(phi1_matlab) + i*imag(phi1_matlab));
 phi1_mag_log = log(phi1_mag);
 
-%% plot eigenfunctions
-figure(3)
-ic_pts = 1; Dom = [-0.1, 0.1]; tspan = [0,100];
-% eigenfucntion 1 mag and phase
-subplot(2,4,5)
-p1 = pcolor(q1,q2,phi1_mag); hold on;
-set(p1,'Edgecolor','none')
-colormap jet
-
-l = streamslice(X,Y,u,v); hold on;
-set(l,'LineWidth',1)
-set(l,'Color','k');
-ff = @(t,x)[alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
-for x0 = linspace(Dom(1), Dom(2), ic_pts)
-    for y0 = linspace(Dom(1), Dom(2), ic_pts)
-        [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
-        plot(xs(:,1),xs(:,2),'k','LineWidth',1); hold on;
-    end
-end
-xlim([-3,3])
-ylim([-3,3])
-axes = gca;
+%% scatter plots
+figure(1)
+sz = 10; alpha = 1;
+subplot(2,4,1)
+Xs = [];
+scatter(q1(:),q2(:),sz,phi1_mag(:),'filled','MarkerFaceAlpha',alpha); hold on;
+axes1 = gca;
 axis square
-set(axes,'FontSize',15);
+set(axes1,'FontSize',15);
 xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
 ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
+colorbar('southoutside')
 box on
-axes.LineWidth=2;
-colorbar
-
-subplot(2,4,6)
-p2 = pcolor(q1,q2,phi1_phase); hold on;
-set(p2,'Edgecolor','none')
-colormap jet
-l = streamslice(X,Y,u,v); hold on;
-set(l,'LineWidth',1)
-set(l,'Color','k');
-ff = @(t,x)[alpha*x(2); alpha*(mu*x(2) - x(1) - mu*x(1)^2*x(2))];
-for x0 = linspace(Dom(1), Dom(2), ic_pts)
-    for y0 = linspace(Dom(1), Dom(2), ic_pts)
-        [ts,xs] = ode45(@(t,x)ff(t,x),tspan,[x0 y0]);
-        plot(xs(:,1),xs(:,2),'k','LineWidth',1); hold on;
-    end
-end
-xlim([-3,3])
-ylim([-3,3])
-axes = gca;
-axis square
-set(axes,'FontSize',15);
-xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
-ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-box on
-axes.LineWidth=2;
-colorbar
+axes1.LineWidth=2;
 
 %% helper functions
 
