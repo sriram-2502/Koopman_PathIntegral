@@ -1,5 +1,5 @@
 %% eigenfunctions for duffing system
-clc; clear; %close all;
+clc; clear; close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 % linearization at (0,0) saddle

@@ -1,5 +1,5 @@
 %% eigenfunctions for duffing system using forward time
-clc; clear; %close all;
+clc; clear; close all;
 %% system description
 % nonlinear ode x_dot = f(x)
 %eqb_point_node = [-1 0];
@@ -9,7 +9,7 @@ Dom = [-3 3];
 
 x = sym('x',[2;1]); 
 delta = 0.5;
-f = [x(2); + x(1) - delta*x(2) - x(1)^3 ]; 
+f = [x(2); + x(1) - delta*x(2) - x(1)^3]; 
 % shift eqb point to -1,0
 f_shifted = [x(2); + x(1) + shift - delta*x(2) - (x(1)+shift).^3 ]; 
 
@@ -145,7 +145,7 @@ box on
 axes.LineWidth=2;
 colorbar
 
-subplot(2,4,3)
+subplot(2,4,2)
 p2 = pcolor(q1,q2,phi1_phase); hold on;
 set(p2,'Edgecolor','none')
 colormap jet
@@ -163,34 +163,34 @@ box on
 axes.LineWidth=2;
 colorbar
 
-subplot(2,4,2)
-[min_val, min_idx] = min(V_lyap,[],'all');
-[r,c] = ind2sub(size(q1), min_idx);
-V_lyap(r,c) = nan;
-[max_val, max_idx] = max(V_lyap,[],'all');
-[r,c] = ind2sub(size(q1), max_idx);
-V_lyap(r,c) = nan;
-
-p2 = pcolor(q1,q2,V_lyap); hold on;
-set(p2,'Edgecolor','none')
-colormap jet
-% % plot level set on top
-% sz = 10;
-% scatter(x_zero-1,y_zero,sz,'MarkerEdgeColor','black','MarkerFaceColor','black')
-% plot streamlines on top
-l = streamslice(X,Y,u,v); hold on;
-set(l,'LineWidth',1)
-set(l,'Color','k');
-xlim([-2-shift,2-shift])
-ylim([-2,2])
-axes = gca;
-axis square
-set(axes,'FontSize',15);
-xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
-ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
-box on
-axes.LineWidth=2;
-colorbar
+% subplot(2,4,2)
+% [min_val, min_idx] = min(V_lyap,[],'all');
+% [r,c] = ind2sub(size(q1), min_idx);
+% V_lyap(r,c) = nan;
+% [max_val, max_idx] = max(V_lyap,[],'all');
+% [r,c] = ind2sub(size(q1), max_idx);
+% V_lyap(r,c) = nan;
+% 
+% p2 = pcolor(q1,q2,V_lyap); hold on;
+% set(p2,'Edgecolor','none')
+% colormap jet
+% % % plot level set on top
+% % sz = 10;
+% % scatter(x_zero-1,y_zero,sz,'MarkerEdgeColor','black','MarkerFaceColor','black')
+% % plot streamlines on top
+% l = streamslice(X,Y,u,v); hold on;
+% set(l,'LineWidth',1)
+% set(l,'Color','k');
+% xlim([-2-shift,2-shift])
+% ylim([-2,2])
+% axes = gca;
+% axis square
+% set(axes,'FontSize',15);
+% xlabel('$x_1$','FontSize',20, 'Interpreter','latex')
+% ylabel('$x_2$','FontSize',20, 'Interpreter','latex')
+% box on
+% axes.LineWidth=2;
+% colorbar
 
 %% helper functions
 

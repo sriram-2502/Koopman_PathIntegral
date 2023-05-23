@@ -91,6 +91,7 @@ parfor i = 1:length(x_0)
 end
 
 tspan = [-100 0];
+% tspan = [0 -10];
 parfor i = 1:length(x_0)    
     [t,x] = ode45(@(t,x)f(x(1),x(2),x(3)),tspan,x_0(i,:),options);
     phi1 = [phi1, (w1_real'*x_0(i,:)' -...

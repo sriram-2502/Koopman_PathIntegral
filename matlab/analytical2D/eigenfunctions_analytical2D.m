@@ -26,7 +26,7 @@ x = sym('x',[2;1], 'real');
 % sys 2
 % https://epubs.siam.org/doi/pdf/10.1137/17M116207X
 Dom = [-1 1]; ds = 0.05;
-a1=-1; a2=3;
+a1=-3; a2=-3;
 f = @(t, x) [-2*a2*x(2,:).*(x(1,:).^2-x(2,:)-2*x(1,:).*x(2,:).^2+x(2,:).^4) +  ...
                    a1*(x(1,:)+4*x(1,:).^2.*x(2,:)-x(2,:).^2-8*x(1,:).*x(2,:).^3+4*x(2,:).^5);
            2*a1*(x(1,:)-x(2,:).^2).^2-a2*(x(1,:).^2-x(2,:)-2*x(1,:).*x(2,:).^2+x(2,:).^4)];
@@ -77,7 +77,7 @@ x_0 = [q1(:),q2(:)]; phi1_est=[];phi2_est=[];
 options = odeset('RelTol',1e-9,'AbsTol',1e-300);
 
 % for negative time
-tspan = [0 -10]; 
+tspan = [0 10]; 
 parfor i = 1:length(x_0)
     [t,x] = ode45(@(t,x)f(t,x),tspan,x_0(i,:),options);
     phi1_est = [phi1_est, w1'*x_0(i,:)' + trapz(t,exp(-l1*t).*g1(x')')];

@@ -1,6 +1,6 @@
 % Path integral Eigenfunctions
 % Anaytical Example
-clear; clc; close all;
+clear; clc; %close all;
 set(0,'DefaultLineLineWidth',2) %linewidh on plots
 set(0,'defaultfigurecolor',[1 1 1])
 use_euler = false; % flag to use euler integration or not
@@ -63,7 +63,7 @@ x_0 = [grid_pts(:)]; phi_est_nonlin=[];phi_est_lin=[]; phi_est_direct=[];
 options = odeset('RelTol',1e-9,'AbsTol',1e-300);
 
 % t_span = [-1 0];
-t_span = [0 10];
+t_span = [0 -10];
 
 if(use_euler)
     x_euler=[];t_euler=[];
@@ -105,7 +105,7 @@ end
 
 %% Eigenfunctions
 figure(1)
-subplot(2,2,1)
+subplot(2,4,2)
 plot(grid_pts,Phi);
 % title('true $\phi(x) = \frac{x}{\sqrt{1-x^2}}$','Interpreter','latex')
 xlabel('$x$','interpreter','latex');
@@ -119,9 +119,9 @@ box on
 axes.LineWidth=2;
 axis square
 
-subplot(2,2,2)
+subplot(2,4,2)
 hold on;
-plot(grid_pts,phi_est); hold on;
+plot(grid_pts,phi_est,'--'); hold on;
 % plot(grid_pts,phi_est_lin,'--'); hold on;
 % title('estimated $\phi(x)$','Interpreter','latex')
 xlabel('$x$','interpreter','latex');
@@ -135,33 +135,33 @@ box on
 axes.LineWidth=2;
 axis square
 
-subplot(2,2,3)
-plot(grid_pts,phi_est_lin);
-% title('true $\phi(x) = \frac{x}{\sqrt{1-x^2}}$','Interpreter','latex')
-xlabel('$x$','interpreter','latex');
-ylabel('$\phi(x)$','interpreter','latex');
-axes = gca;
-set(gca,'fontsize',20)
-grid on
-% xlim([-0.9,0.9])
-ylim([-2,2])
-box on
-axes.LineWidth=2;
-axis square
-
-subplot(2,2,4)
-plot(grid_pts,phi_est_nonlin); hold on;
-% title('estimated $\phi(x)$','Interpreter','latex')
-xlabel('$x$','interpreter','latex');
-ylabel('$\phi(x)$','interpreter','latex');
-axes = gca;
-set(gca,'fontsize',20)
-grid on
-% xlim([-0.9,0.9])
-ylim([-2,2])
-box on
-axes.LineWidth=2;
-axis square
+% subplot(2,2,3)
+% plot(grid_pts,phi_est_lin);
+% % title('true $\phi(x) = \frac{x}{\sqrt{1-x^2}}$','Interpreter','latex')
+% xlabel('$x$','interpreter','latex');
+% ylabel('$\phi(x)$','interpreter','latex');
+% axes = gca;
+% set(gca,'fontsize',20)
+% grid on
+% % xlim([-0.9,0.9])
+% ylim([-2,2])
+% box on
+% axes.LineWidth=2;
+% axis square
+% 
+% subplot(2,2,4)
+% plot(grid_pts,phi_est_nonlin); hold on;
+% % title('estimated $\phi(x)$','Interpreter','latex')
+% xlabel('$x$','interpreter','latex');
+% ylabel('$\phi(x)$','interpreter','latex');
+% axes = gca;
+% set(gca,'fontsize',20)
+% grid on
+% % xlim([-0.9,0.9])
+% ylim([-2,2])
+% box on
+% axes.LineWidth=2;
+% axis square
 
 %% helper functions
 function [value,isterminal,direction]=offFrame(~, Y, Dom)
