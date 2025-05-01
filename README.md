@@ -1,6 +1,6 @@
 # Computation of Principle Eigenfunctions of the Koopman Operator using Path Integrals
-Our paper can be found here: Path-Integral Formula for Computing Koopman Eigenfunctions
-To cite our work
+To cite our work: Path-Integral Formula for Computing Koopman Eigenfunctions
+
 ```
 @inproceedings{deka2023path,
   title={Path-integral formula for computing Koopman eigenfunctions},
